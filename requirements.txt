@@ -2,12 +2,17 @@
 fastapi
 uvicorn
 pandas
-numpy
+numpy<2
 faiss-cpu
 sentence-transformers
 google-generativeai
 python-dotenv
 beautifulsoup4
 requests
-torch
+
+torch==2.2.2+cpu
+torchvision==0.17.2+cpu
+torchaudio==2.2.2+cpu
+
+--extra-index-url https://download.pytorch.org/whl/cpu
 
