@@ -1,0 +1,54 @@
+# render.yaml – Render.com deployment configuration
+# Deploy your SHL API to Render in one click with this file.
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: shl-assessment-api
+    env: python
+    region: oregon           # or: frankfurt, singapore, ohio
+    plan: starter            # free tier: 512MB RAM, spins down after inactivity
+                             # upgrade to "standard" for production (always-on)
+    buildCommand: >
+      pip install -r requirements.txt &&
+      python embedding.py
+    startCommand: >
+      uvicorn main:app
+      --host 0.0.0.0
+      --port $PORT
+      --workers 1
+      --log-level info
+    healthCheckPath: /health
+
+    # Environment variables (set sensitive ones in Render dashboard)
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false          # Set this manually in Render dashboard → Environment
+
+      - key: GEMINI_MODEL
+        value: gemini-1.5-flash-latest
+
+      - key: GEMINI_TEMPERATURE
+        value: "0.2"
+
+      - key: GEMINI_MAX_TOKENS
+        value: "2048"
+
+      - key: EMBEDDING_MODEL
+        value: all-MiniLM-L6-v2
+
+      - key: SHL_CSV_PATH
+        value: shl_catalog.csv
+
+      - key: SHL_INDEX_PATH
+        value: shl_index.faiss
+
+      - key: PORT
+        value: "8000"
+
+    # Persistent disk to store the FAISS index across deploys
+    # (if not committing the .faiss file to the repo)
+    # disk:
+    #   name: shl-data
+    #   mountPath: /opt/render/project/src
+    #   sizeGB: 1
